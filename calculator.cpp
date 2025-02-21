@@ -1,5 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 #define ID_EDIT1 101
 #define ID_EDIT2 102
@@ -18,9 +20,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         case WM_CREATE:
             CreateWindow("STATIC", "Please input two numbers", WS_VISIBLE | WS_CHILD,
                 30, 10, 200, 20, hwnd, NULL, NULL, NULL);
-            hEdit1 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
+
+            hEdit1 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER,
                 30, 40, 180, 20, hwnd, (HMENU)ID_EDIT1, NULL, NULL);
-            hEdit2 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
+            hEdit2 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER,
                 30, 70, 180, 20, hwnd, (HMENU)ID_EDIT2, NULL, NULL);
 
             hAdd = CreateWindow("BUTTON", "+", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
@@ -34,36 +37,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
 
         case WM_COMMAND:
-            GetWindowText(hEdit1, num1, 20);
-            GetWindowText(hEdit2, num2, 20);
-            val1 = atof(num1);
-            val2 = atof(num2);
+            if (LOWORD(wParam) >= ID_BUTTON_ADD && LOWORD(wParam) <= ID_BUTTON_DIV) {
+                GetWindowText(hEdit1, num1, 20);
+                GetWindowText(hEdit2, num2, 20);
 
-            switch (LOWORD(wParam)) {
-                case ID_BUTTON_ADD:
-                    result = val1 + val2;
-                    sprintf(buffer, "Result: %.6f", result);
-                    MessageBox(hwnd, buffer, "Result", MB_OK);
+                // ตรวจสอบว่าสามารถแปลงเป็นตัวเลขได้
+                if (sscanf(num1, "%lf", &val1) != 1 || sscanf(num2, "%lf", &val2) != 1) {
+                    MessageBox(hwnd, "Invalid input! Please enter valid numbers.", "Error", MB_OK | MB_ICONERROR);
                     break;
-                case ID_BUTTON_SUB:
-                    result = val1 - val2;
-                    sprintf(buffer, "Result: %.6f", result);
-                    MessageBox(hwnd, buffer, "Result", MB_OK);
-                    break;
-                case ID_BUTTON_MUL:
-                    result = val1 * val2;
-                    sprintf(buffer, "Result: %.6f", result);
-                    MessageBox(hwnd, buffer, "Result", MB_OK);
-                    break;
-                case ID_BUTTON_DIV:
-                    if (val2 != 0) {
-                        result = val1 / val2;
+                }
+
+                switch (LOWORD(wParam)) {
+                    case ID_BUTTON_ADD:
+                        result = val1 + val2;
                         sprintf(buffer, "Result: %.6f", result);
-                    } else {
-                        sprintf(buffer, "Cannot divide by zero!");
-                    }
-                    MessageBox(hwnd, buffer, "Result", MB_OK);
-                    break;
+                        MessageBox(hwnd, buffer, "Result", MB_OK);
+                        break;
+                    case ID_BUTTON_SUB:
+                        result = val1 - val2;
+                        sprintf(buffer, "Result: %.6f", result);
+                        MessageBox(hwnd, buffer, "Result", MB_OK);
+                        break;
+                    case ID_BUTTON_MUL:
+                        result = val1 * val2;
+                        sprintf(buffer, "Result: %.6f", result);
+                        MessageBox(hwnd, buffer, "Result", MB_OK);
+                        break;
+                    case ID_BUTTON_DIV:
+                        if (val2 != 0) {
+                            result = val1 / val2;
+                            sprintf(buffer, "Result: %.6f", result);
+                        } else {
+                            sprintf(buffer, "Cannot divide by zero!");
+                        }
+                        MessageBox(hwnd, buffer, "Result", MB_OK);
+                        break;
+                }
             }
             break;
 
