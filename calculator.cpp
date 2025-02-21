@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #define ID_EDIT1 101
 #define ID_EDIT2 102
@@ -18,7 +17,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
     switch (msg) {
         case WM_CREATE:
-            CreateWindow("STATIC", "Please input two numbers", WS_VISIBLE | WS_CHILD,
+            CreateWindow("STATIC", "Enter two numbers:", WS_VISIBLE | WS_CHILD,
                 30, 10, 200, 20, hwnd, NULL, NULL, NULL);
 
             hEdit1 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER,
@@ -41,7 +40,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 GetWindowText(hEdit1, num1, 20);
                 GetWindowText(hEdit2, num2, 20);
 
-                // ตรวจสอบว่าสามารถแปลงเป็นตัวเลขได้
                 if (sscanf(num1, "%lf", &val1) != 1 || sscanf(num2, "%lf", &val2) != 1) {
                     MessageBox(hwnd, "Invalid input! Please enter valid numbers.", "Error", MB_OK | MB_ICONERROR);
                     break;
@@ -51,28 +49,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                     case ID_BUTTON_ADD:
                         result = val1 + val2;
                         sprintf(buffer, "Result: %.6f", result);
-                        MessageBox(hwnd, buffer, "Result", MB_OK);
                         break;
                     case ID_BUTTON_SUB:
                         result = val1 - val2;
                         sprintf(buffer, "Result: %.6f", result);
-                        MessageBox(hwnd, buffer, "Result", MB_OK);
                         break;
                     case ID_BUTTON_MUL:
                         result = val1 * val2;
                         sprintf(buffer, "Result: %.6f", result);
-                        MessageBox(hwnd, buffer, "Result", MB_OK);
                         break;
                     case ID_BUTTON_DIV:
-                        if (val2 != 0) {
-                            result = val1 / val2;
-                            sprintf(buffer, "Result: %.6f", result);
-                        } else {
+                        if (val2 != 0)
+                            sprintf(buffer, "Result: %.6f", val1 / val2);
+                        else
                             sprintf(buffer, "Cannot divide by zero!");
-                        }
-                        MessageBox(hwnd, buffer, "Result", MB_OK);
                         break;
                 }
+                MessageBox(hwnd, buffer, "Result", MB_OK);
             }
             break;
 
@@ -93,7 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
-    wc.hbrBackground = CreateSolidBrush(RGB(139, 0, 0)); 
+    wc.hbrBackground = CreateSolidBrush(RGB(0, 200, 200));
     wc.lpszClassName = "MyCalculator";
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 
@@ -102,7 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
-    hwnd = CreateWindow("MyCalculator", "My Calculator", WS_OVERLAPPED | WS_SYSMENU,
+    hwnd = CreateWindow("MyCalculator", "My Calculator", WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, CW_USEDEFAULT, 250, 200,
         NULL, NULL, hInstance, NULL);
 
